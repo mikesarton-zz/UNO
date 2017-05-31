@@ -249,4 +249,114 @@ public class UnoGUI implements Observer {
             }
         });
         
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+        MenuItem itemExit = new MenuItem("Quitter");
+        itemExit.setOnAction((ActionEvent t) -> {
+            scene.getWindow().hide();
+        });
+
+        MenuItem itemScore = new MenuItem("Changer score");
+        itemScore.setOnAction((ActionEvent t) -> {
+            ScoreGUI scoreGUI = new ScoreGUI((Stage) scene.getWindow(), 
+                    uno.getScoreToReach());
+            try {
+                int score = scoreGUI.getScore();
+                if(score != 0){
+                    uno.setScoreToReach(score);   
+                }
+            } catch (UnoException e) {
+                Alert alert = new Alert(Alert.AlertType.ERROR, e.getMessage());
+                alert.showAndWait();
+            }
+        });
+        
+        menuGame.getItems().addAll(itemExit, itemRestart, itemScore);
+        menuBar.getMenus().add(menuGame);
+
+        return menuBar;
+    }
+
+    private ScrollPane infoBox(List<Player> players, Player currentPlayer) {
+
+        ScrollPane sp = new ScrollPane();
+        sp.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        sp.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+        sp.getStyleClass().add("scroll-pane");
+
+        GridPane gp = new GridPane();
+
+        Label lblTitleName = creationLabel("Nom", gp, 0, 0);
+        Label lblTitleScore = creationLabel("Score", gp, 1, 0);
+        lblTitleName.setUnderline(true);
+        lblTitleScore.setUnderline(true);
+
+        for (int i = 0; i < players.size(); i+=2) {
+            Label lblName = creationLabel(players.get(i).getName(),
+                    gp, 0, i + 1);
+            creationLabel(String.valueOf(players.get(i).getScore()),
+                    gp, 1, i + 1);
+            if (players.get(i).hashCode() == currentPlayer.hashCode()) {
+                lblName.setUnderline(true);
+            }
+            if (players.get(i).getCards().size() == 1) {
+                creationLabel("UNO", gp, 2, i + 1);
+            }
+
+            if (i + 1 < players.size()) {
+                Label lblName2 = creationLabel(players.get(i + 1).getName(), gp, 3, i + 1);
+                creationLabel(String.valueOf(players.get(i + 1).getScore()),
+                        gp, 4, i + 1);
+                if (players.get(i + 1).hashCode() == currentPlayer.hashCode()) {
+                    lblName2.setUnderline(true);
+                }
+                if (players.get(i + 1).getCards().size() == 1) {
+                    creationLabel("UNO", gp, 5, i + 1);
+                }
+            }
+        }
+
+        sp.setContent(gp);
+
+        return sp;
+    }
+
+    private Label creationLabel(String name, GridPane gp, int column, int line) {
+
+        Label lbl = new Label(name);
+        lbl.setFont(Font.font("System", 15));
+        lbl.setTextFill(Color.WHITE);
+        gp.add(lbl, column, line);
+        GridPane.setMargin(lbl, new Insets(10, 0, 0, 10));
+
+        return lbl;
+    }
+
+    private Button creationButton(String title, double width) {
+        Button button = new Button();
+        button.setText(title);
+        button.setMaxWidth(width);
+        button.getStyleClass().add("buttons");
+
+        return button;
+    }
+
+    @Override
+    public void update() {
+        try {
+            if (uno.getIsOver()) {
+                handleEndGame();
+            } else {
+                setInfosLine(uno.getPlayers(), uno.getFlippedCard(), 
+                                    uno.getCurrentPlayer(), uno.isDeckEmpty());
+                setHandPlayer(uno.getCurrentPlayer().getCards());
+            }
+        } catch (UnoException e) {
+            Alert alert = new Alert(Alert.AlertType.ERROR, e.getMessage());
+            alert.show();
+        }
+    }
+
+    @Override
+    public void updateMusic() {
+        setButtons(mediaPlayer.getVolume());
+    }
+}

@@ -372,4 +372,72 @@ public class Uno implements Observable {
         boolean found = false;
         int cpt = 0;
         while (!found) {
-            found = players.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
+            found = players.get(cpt).getScore() >= scoreToReach;
+            ++cpt;
+            if (cpt == players.size()) {
+                break;
+            }
+        }
+        isOver = found;
+    }
+    
+    public void setScoreToReach(int value) throws UnoException {
+        if(value < 0 || value > 700) {
+            throw new UnoException ("Nouveau score invalide. Le nouveau score"
+                    + " doit être compris entre 1 et 700.");
+        }
+        scoreToReach = value;
+        checkScoreLimit();
+        if(isOver){
+            state = StateOfGame.STOPPED;
+        }
+        notifyObs();
+    }
+    
+    public int getScoreToReach() {
+        return scoreToReach;
+    }
+
+    /**
+     * This method add an observer to the list of observers.
+     * @param obs The observer to add.
+     */
+    @Override
+    public void addObserver(Observer obs) {
+        if (!observers.contains(obs)) {
+            observers.add(obs);
+        }
+    }
+
+    /**
+     * This method delete an observer from the list of observers.
+     * @param obs The observer to delete.
+     */
+    @Override
+    public void deleteObserver(Observer obs) {
+        if (observers.contains(obs)) {
+            observers.remove(obs);
+        }
+    }
+
+    /**
+     * This method calls the update() method of each observer.
+     * @param isOver Boolean set to true if the game is over, false otherwise.
+     */
+    @Override
+    public void notifyObs() {
+        observers.forEach((obs) -> {
+            obs.update();
+        });
+    }
+
+    private boolean onlyIA() {
+        int cpt = 0;
+        for (Player pl : players) {
+            if (pl.isIA()) {
+                cpt++;
+            }
+        }
+        return cpt == players.size();
+    }
+}

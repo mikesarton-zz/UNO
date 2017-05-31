@@ -217,4 +217,107 @@ class ThreadClient extends Thread implements Observer {
             JSONArray playerHand = (JSONArray) root.get(name + "Main");
             JSONArray IAHand = (JSONArray) root.get("IAMain");
             List<String> lplayerHand = new ArrayList<>();
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
+            List<String> lIAHand = new ArrayList<>();
+            for(Object obj : playerHand) {
+                JSONObject card = (JSONObject) obj;
+                lplayerHand.add((String) card.get("c"));
+            }
+            for(Object obj : IAHand) {
+                JSONObject card = (JSONObject) obj;
+                lIAHand.add((String) card.get("c"));
+            }
+            uno.resetGame(playerScore, currentPlayerName, iaScore, scoreToReach,
+                    topCard, lplayerHand, lIAHand);
+        } catch (UnoException ue) {
+            System.out.println("ThreadClient: Reconnexion: " + ue.getMessage());
+            server.addMessage(client, ue.getMessage());
+        }
+        
+    }
+    
+    private void saveGameState() {
+        File file = new File(name + "Game.json");
+        
+        if(file.exists() && !file.isDirectory()) {
+            cleanFile(file);
+        }
+        
+        //  création d'un objet root
+        JSONObject root = new JSONObject();
+        
+        //  ajout du nom du joueur
+        root.put("nomJoueur", name);
+        
+        //  ajout des scores du joueur et de l'IA
+        for(Player pl : uno.getPlayers()) {
+            root.put(pl.getName() + "Score", pl.getScore());
+        }        
+        
+        //  ajout du score à atteindre
+        root.put("scoreToReach", uno.getScoreToReach());
+        
+        try {
+            //  ajout de la top carte
+            root.put("topCarte", uno.getFlippedCard().getColorShortcut()
+                    + uno.getFlippedCard().getValueInt());
+
+            //  ajout du nom du joueur courant
+            root.put("currentPlayer", uno.getCurrentPlayer().getName());
+        } catch (UnoException ue) {
+            System.out.println("ThreadClient -> tentative de "
+                    + "sauvegarder la top carte : "
+                    + ue.getMessage());
+            server.addMessage(client, ue.getMessage());
+        }
+
+        //  ajout des objets mains
+        for(Player pl : uno.getPlayers()) {
+            JSONArray main = new JSONArray();
+            int i=1;
+            for(Card c : pl.getCards()) {
+                JSONObject carte = new JSONObject();
+                carte.put("c", c.getColorShortcut() + c.getValueInt());
+                main.add(carte);
+                ++i;
+            }
+            root.put(pl.getName() + "Main", main);
+        }
+        
+        // écriture du contenu dans un fichier json
+        try {
+            PrintWriter writer = new PrintWriter(file);
+            writer.print(root.toJSONString());
+            writer.close();
+        } catch (FileNotFoundException fnfe) {
+            System.out.println("ThreadClient -> tentative d'écrire la sauvegarde "
+                    + "dans un fichier json: " + fnfe.getMessage());
+            server.addMessage(client, fnfe.getMessage());
+        }
+    }
+    
+    private void cleanFile(File file) {
+        try {
+            PrintWriter w = new PrintWriter(file);
+            w.close();
+        } catch (FileNotFoundException fnfe) {
+            System.out.println("ThreadClient: " + fnfe.getMessage());
+            server.addMessage(client, fnfe.getMessage());
+        }
+    }
+    
+    private void deleteSaveFile() {
+        try {            
+            Files.delete(Paths.get(name + "Game.json"));
+        } catch (IOException ioe) {
+            System.out.println("ThreadClient: impossible de supprimer le fichier "
+                    + "de sauvegarde : " + ioe.getMessage());
+            server.addMessage(client, ioe.getMessage());
+        }
+    }
+
+    @Override
+    public void update() {
+        sendClientGameState();
+    }
+
+}

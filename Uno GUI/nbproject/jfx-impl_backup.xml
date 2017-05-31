@@ -3943,4 +3943,66 @@
     </target>
 
     <target name="jfxbe-run" if="html-file-exists" depends="-mark-project-state-running,-clean-if-config-changed,-mark-project-needs-jnlp,-check-jdk-7u4or5-mac,jar,
-            -check-selected-browser-path,-set-html-file,-c                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
+            -check-selected-browser-path,-set-html-file,-check-jfx-runtime,-check-concurrent-html-runs,-create-temp-run-dir,-warn-insufficient-signing"
+            description="Start JavaFX execution in browser">
+        <echo message="Executing ${temp.run.html} using ${javafx.run.inbrowser}"/>
+        <echo message="(${javafx.run.inbrowser.path})"/>
+        <property name="javafx.run.inbrowser.arguments" value=""/>
+        <exec executable="${javafx.run.inbrowser.path}">
+            <arg line="${javafx.run.inbrowser.arguments}"/>
+            <arg file="${temp.run.html}"/>
+        </exec>
+        <antcall target="-warn-concurrent-html-runs"/>
+    </target>
+    
+    <target name="jfxbe-debug" if="html-file-exists+netbeans.home" depends="-mark-project-state-debugging-in-browser,-init-debug-args,
+            clean,-debug-start-debugger,-mark-project-needs-jnlp,-check-jdk-7u4or5-mac,jar,
+            -check-selected-browser-path,-set-html-file,-check-jfx-runtime,-warn-insufficient-signing,
+            -debug-jfxbe-debuggee" description="Debug JavaFX project in browser">
+        <!-- after the session clean up the jnlp containing debug settings -->
+        <antcall target="clean"/>
+    </target>
+        
+    <target name="-debug-jfxbe-debuggee" depends="-init-debug-args">
+        <echo message="Executing ${jfx.deployment.html} in debug mode using ${javafx.run.inbrowser}"/>
+        <echo message="(${javafx.run.inbrowser.path})"/>
+        <property name="javafx.run.inbrowser.arguments" value=""/>
+        <exec executable="${javafx.run.inbrowser.path}">
+            <arg line="${javafx.run.inbrowser.arguments}"/>
+            <env key="_JPI_VM_OPTIONS" value="-agentlib:jdwp=transport=${debug-transport},address=${jpda.address}"/>
+            <arg file="${jfx.deployment.html}"/>
+        </exec>
+    </target>
+
+    <target if="html-file-exists+netbeans.home" name="-profile-check-html">
+        <antcall target="-profile-check-1"/>
+    </target>
+
+    <target name="-do-jfxbe-profile" depends="-mark-project-state-profiling,-mark-project-needs-jnlp,
+            -check-jdk-7u4or5-mac,jar,-check-selected-browser-path,-set-html-file,-check-jfx-runtime,-warn-insufficient-signing">
+        <echo message="Executing ${jfx.deployment.html} in profile mode using ${javafx.run.inbrowser}"/>
+        <echo message="(${javafx.run.inbrowser.path})"/>
+        <property name="run.jvmargs.ide" value=""/>
+        <property name="javafx.run.inbrowser.arguments" value=""/>
+        <exec executable="${javafx.run.inbrowser.path}">
+            <arg line="${javafx.run.inbrowser.arguments}"/>
+            <env key="_JPI_VM_OPTIONS" value="${run.jvmargs.ide}"/>
+            <arg file="${jfx.deployment.html}"/>
+        </exec>
+    </target>
+
+    <target name="jfxbe-profile" if="profiler.configured"
+        depends="-profile-check-html"
+        description="Profile JavaFX project in browser">
+        <startprofiler/>
+        <antcall target="-do-jfxbe-profile"/>
+    </target>
+
+    <target name="jfxbe-run-noscript" depends="-set-fallback-no-javascript, jfxbe-run"/>
+
+    <target name="jfxbe-debug-noscript" depends="-set-fallback-no-javascript, jfxbe-debug"/>
+
+    <target name="jfxbe-profile-noscript" depends="-set-fallback-no-javascript, jfxbe-profile"/>
+
+
+</project>

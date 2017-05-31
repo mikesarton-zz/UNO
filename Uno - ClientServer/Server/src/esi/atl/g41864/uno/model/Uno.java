@@ -355,4 +355,108 @@ public class Uno implements Observable {
      * This method checks if the current player's hand is empty. If so, it sets
      * the game's state to "stopped", and calls methods to calcul the score of
      * add to the current player. It prints the new score of the player. If the
-     * goal score is reached, it prints also a score board. If not, it starts a                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+     * goal score is reached, it prints also a score board. If not, it starts a
+     * new game.
+     *
+     * @throws UnoException If the game is stopped.
+     */
+    private void isOver() throws UnoException {
+        if (state != StateOfGame.RUNNING) {
+            throw new UnoException("isOver() ne peut pas être appelé si "
+                    + "le jeu n'est pas en train de tourner.");
+        }
+
+        state = StateOfGame.STOPPED;
+        currentPlayer.updateScore(calculPoints());
+        checkScoreLimit();
+        if (isOver) {
+            notifyObs();
+        } else {
+            start();
+        }
+    }
+
+    /**
+     * This method calculs the score to add to the winner.
+     *
+     * @return The score to add.
+     */
+    private int calculPoints() {
+        int score = 0;
+        for (Player pl : players) {
+            if (pl.hashCode() != currentPlayer.hashCode()) {
+                List<Card> hand = pl.getCards();
+                for (Card card : hand) {
+                    score += Integer.valueOf(card.getValueInt());
+                }
+            }
+        }
+
+        return score;
+    }
+
+    /**
+     * This method checks if the goal score is reached.
+     *
+     * @return True if the score is reached, false otherwise.
+     */
+    private void checkScoreLimit() {
+        boolean found = false;
+        int cpt = 0;
+        while (!found) {
+            found = players.get(cpt).getScore() >= scoreToReach;
+            ++cpt;
+            if (cpt == players.size()) {
+                break;
+            }
+        }
+        isOver = found;
+    }
+    
+    /**
+     * This methods change the score to reach.
+     * @param value The new score to reach.
+     * @throws UnoException If the score is less than 0 or greater than 700
+     */
+    public void setScoreToReach(int value) throws UnoException {
+        if(value < 0 || value > 700) {
+            throw new UnoException ("Nouveau score invalide. Le nouveau score"
+                    + " doit être compris entre 1 et 700.");
+        }
+        scoreToReach = value;
+        checkScoreLimit();
+        if(isOver){
+            state = StateOfGame.STOPPED;
+        }
+        notifyObs();
+    }
+    
+    /**
+     * This methods returns the score to reach.
+     * @return
+     */
+    public int getScoreToReach() {
+        return scoreToReach;
+    }
+
+    @Override
+    public void addObserver(Observer obs) {
+        if (!observers.contains(obs)) {
+            observers.add(obs);
+        }
+    }
+
+    @Override
+    public void deleteObserver(Observer obs) {
+        if (observers.contains(obs)) {
+            observers.remove(obs);
+        }
+    }
+
+    @Override
+    public void notifyObs() {
+        observers.forEach((obs) -> {
+            obs.update();
+        });
+    }
+}

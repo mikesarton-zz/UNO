@@ -3880,4 +3880,75 @@ var dtjava = function() {
             this.onInstallFinished = defaultInstallFinishedHandler;
 
             /**
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
+             This function is called if application can not be deployed because
+             current platform does not match given platform requirements.
+             It is also called if request to install missing components can not be
+             completed due to platform.
+             <p>
+             Problem can be fatal error or transient issue (e.g. relaunch needed). Further
+             details can be extracted from provided mismatchEvent. Here are some typical combinations:
+
+             <ul>
+             <li><em>Current browser is not supported by Java</em> - (r.isUnsupportedBrowser())
+             <li><em>Browser need to be restarted before application can be launched</em> - (r.isRelaunchNeeded())
+             <li>JRE specific codes
+             <ul>
+             <li><em>JRE is not supported on this platform</em> - (r.jreStatus() == "unsupported")
+             <li><em>JRE is not detected and need to be installed</em> - (r.jreStatus() == "none")
+             <li><em>Installed version of JRE does not match requirements</em> - (r.jreStatus() == "old")
+             <li><em>Matching JRE is detected but deprecated Java plugin is used and
+                     it does not support JNLP applets</em> - (r.jreStatus() == "oldplugin")
+             </ul>
+             <li> JavaFX specific codes
+             <ul>
+             <li><em>JavaFX is not supported on this platform</em> - (r.javafxStatus() == "unsupported")
+             <li><em>JavaFX Runtime is missing and need to be installed manually</em> - (r.javafxStatus() == "none")
+             <li><em>Installed version of JavaFX Runtime does not match requirements</em> - (r.javafxStatus() == "old")
+             <li><em>JavaFX Runtime is installed but currently disabled</em> - (r.javafxStatus() == "disabled")
+             </ul>
+             </ul>
+
+             Default error handler handles both application launch errors and embedded content.
+
+             @property onDeployError
+             @type function(app, mismatchEvent)
+             */
+            this.onDeployError = defaultDeployErrorHandler;
+
+            /**
+             * Called to get content to be shown in the applet area if Java plugin is not installed
+             * and none of callbacks helped to resolve this.
+             *
+             * @property onGetNoPluginMessage
+             * @type function(app)
+             * @return DOM Element object representing content to be shown in the applet area if
+             *         java plugin is not detected by browser.
+             */
+            this.onGetNoPluginMessage = defaultGetNoPluginMessageHandler;
+
+            /**
+             Called once applet is ready to accept Javascript calls.
+             Only supported for plugin version 10.0.0 or later
+             @property onJavascriptReady
+             @type function(id)
+             @default null
+             */
+            this.onJavascriptReady = null;
+
+            /**
+             Called if application failed to launch.
+             Only supported for plugin version 10.0.0 or later.
+
+             @property onRuntimeError
+             @type function(id)
+             @default no op
+             */
+            this.onRuntimeError = defaultRuntimeErrorHandler;
+
+            //overwrite with provided parameters
+            for (c in cb) {
+                this[c] = cb[c];
+            }
+        }
+    };
+}();

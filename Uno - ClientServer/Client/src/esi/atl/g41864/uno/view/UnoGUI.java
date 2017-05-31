@@ -237,4 +237,66 @@ public class UnoGUI implements Observer {
         for (int i = 0; i < players.size(); i+=2) {
             Label lblName = creationLabel(players.get(i).getName(),
                     gp, 0, i + 1);
-            creationLabel(String.valueOf(players.get(i).getScore())                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+            creationLabel(String.valueOf(players.get(i).getScore()),
+                    gp, 1, i + 1);
+            if (players.get(i).hashCode() == currentPlayer.hashCode()) {
+                lblName.setUnderline(true);
+            }
+            if (players.get(i).getCards().size() == 1) {
+                creationLabel("UNO", gp, 2, i + 1);
+            }
+
+            if (i + 1 < players.size()) {
+                Label lblName2 = creationLabel(players.get(i + 1).getName(), gp, 3, i + 1);
+                creationLabel(String.valueOf(players.get(i + 1).getScore()),
+                        gp, 4, i + 1);
+                if (players.get(i + 1).hashCode() == currentPlayer.hashCode()) {
+                    lblName2.setUnderline(true);
+                }
+                if (players.get(i + 1).getCards().size() == 1) {
+                    creationLabel("UNO", gp, 5, i + 1);
+                }
+            }
+        }
+
+        sp.setContent(gp);
+
+        return sp;
+    }
+
+    private Label creationLabel(String name, GridPane gp, int column, int line) {
+
+        Label lbl = new Label(name);
+        lbl.setFont(Font.font("System", 15));
+        lbl.setTextFill(Color.WHITE);
+        gp.add(lbl, column, line);
+        GridPane.setMargin(lbl, new Insets(10, 0, 0, 10));
+
+        return lbl;
+    }
+
+    private Button creationButton(String title, double width) {
+        Button button = new Button();
+        button.setText(title);
+        button.setMaxWidth(width);
+        button.getStyleClass().add("buttons");
+
+        return button;
+    }
+    
+    public void printException(String msg) {
+        Alert alert = new Alert(Alert.AlertType.ERROR, msg);
+        alert.showAndWait();
+    }
+
+    @Override
+    public void update() {
+        setInfosLine(server.getGameState().getPlayers(),
+                server.getGameState().getFlippedCard(),
+                server.getGameState().getCurrentPlayer(),
+                server.getGameState().isDeckEmpty(),
+                server.getGameState().getScoreToReach());
+
+        setHandPlayer(server.getGameState().getCardsCurrentPlayer());
+    }
+}
