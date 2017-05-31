@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0" xmlns:jfx="http://javafx.com" href="DEVIR4_ATL_SartonMike_UnoClient.jnlp">
+  <information>
+    <title>DEVIR4_ATL_SartonMike_UnoClient</title>
+    <vendor>mike</vendor>
+    <description>null</description>
+    <offline-allowed/>
+  </information>
+  <resources>
+    <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
+    <jar href="DEVIR4_ATL_SartonMike_UnoClient.jar" size="3244447" download="eager" />
+    <jar href="lib/DEVIR4_ATL_SartonMike_UnoCommon.jar" size="18865" download="eager" />
+  </resources>
+  <applet-desc  width="800" height="600" main-class="com.javafx.main.NoJavaFXFallback"  name="DEVIR4_ATL_SartonMike_UnoClient" >
+    <param name="requiredFXVersion" value="8.0+"/>
+  </applet-desc>
+  <jfx:javafx-desc  width="800" height="600" main-class="esi.atl.g41864.uno.main.UnoGame"  name="DEVIR4_ATL_SartonMike_UnoClient" />
+  <update check="always"/>
+</jnlp>

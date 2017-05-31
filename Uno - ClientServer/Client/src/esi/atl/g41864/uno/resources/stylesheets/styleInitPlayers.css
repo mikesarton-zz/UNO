@@ -1,0 +1,21 @@
+
+/* 
+    Created on : 20-mars-2017, 21:40:47
+    Author     : mike
+*/
+
+#background {
+    -fx-background-image: url("/esi/atl/g41864/uno/resources/images/bgUnoInit.jpg");
+}
+
+.buttons{
+    -fx-background-color: linear-gradient(#ff5400, #be1d00);
+    -fx-background-radius: 30;
+    -fx-background-insets: 0;
+    -fx-text-fill: white;
+    -fx-font: 25 arial;
+}
+
+#txtField {
+    -fx-font: 25 arial;
+}
