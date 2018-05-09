@@ -1,8 +1,0 @@
-Tue May 09 13:55:20 CEST 2017: 127.0.0.1 s'est connecté.
-Tue May 09 13:59:59 CEST 2017: 127.0.0.1 s'est déconnecté.
-Tue May 09 21:52:01 CEST 2017: 127.0.0.1 s'est connecté.
-Tue May 09 21:52:26 CEST 2017: 127.0.0.1 s'est déconnecté.
-Wed May 10 00:17:24 CEST 2017: 127.0.0.1 s'est connecté.
-Wed May 10 00:19:13 CEST 2017: 127.0.0.1 s'est déconnecté.
-Tue May 16 12:46:37 CEST 2017: 127.0.0.1 s'est connecté.
-Tue May 16 12:46:43 CEST 2017: 127.0.0.1 s'est déconnecté.
